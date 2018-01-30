@@ -445,6 +445,11 @@
         <label>Meter Reset</label>
         <description>Reset the meter</description>
         <category>Energy</category>
+        <state>
+            <options>
+                <option value="ON">Reset</option>
+            </options>
+        </state>
     </channel-type>
 
     <!-- Energy - Voltage -->
@@ -1039,6 +1044,12 @@
         <label>Switch</label>
         <description>Switch the power on and off</description>
         <category>Switch</category>
+        <state>
+            <options>
+                <option value="ON">On</option>
+                <option value="OFF">Off</option>
+            </options>
+        </state>
     </channel-type>
 
     <!-- Brightness (Dimmer) Channel -->
