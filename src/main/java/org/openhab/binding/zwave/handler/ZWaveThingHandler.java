@@ -29,6 +29,8 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.smarthome.config.core.Configuration;
 import org.eclipse.smarthome.config.core.status.ConfigStatusMessage;
 import org.eclipse.smarthome.config.core.validation.ConfigValidationException;
+import org.eclipse.smarthome.core.events.Event;
+import org.eclipse.smarthome.core.events.EventPublisher;
 import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.Channel;
 import org.eclipse.smarthome.core.thing.ChannelUID;
@@ -43,8 +45,12 @@ import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
 import org.openhab.binding.zwave.ZWaveBindingConstants;
+import org.openhab.binding.zwave.event.BindingEventDTO;
+import org.openhab.binding.zwave.event.BindingEventFactory;
+import org.openhab.binding.zwave.event.BindingEventType;
 import org.openhab.binding.zwave.handler.ZWaveThingChannel.DataType;
 import org.openhab.binding.zwave.internal.ZWaveConfigProvider;
+import org.openhab.binding.zwave.internal.ZWaveEventPublisher;
 import org.openhab.binding.zwave.internal.ZWaveProduct;
 import org.openhab.binding.zwave.internal.protocol.SerialMessage;
 import org.openhab.binding.zwave.internal.protocol.ZWaveAssociation;
@@ -1189,8 +1195,12 @@ public class ZWaveThingHandler extends ConfigStatusThingHandler implements ZWave
 
             switch (incEvent.getEvent()) {
                 case ExcludeDone:
-                    // Let our users know we're gone!
-                    updateStatus(ThingStatus.REMOVED, ThingStatusDetail.NONE, "Node was excluded from the controller");
+                    EventPublisher eventPublisher = ZWaveEventPublisher.getEventPublisher();
+                    BindingEventDTO dto = new BindingEventDTO(BindingEventType.SUCCESS,
+                            ZWaveBindingConstants.getI18nConstant(ZWaveBindingConstants.EVENT_EXCLUDED_NODE, incEvent.getNodeId()));
+                    Event notification = BindingEventFactory.createBindingEvent(ZWaveBindingConstants.BINDING_ID,
+                            "exclusion", "success", dto);
+                    eventPublisher.post(notification);
 
                     // Stop polling
                     if (pollingJob != null) {
